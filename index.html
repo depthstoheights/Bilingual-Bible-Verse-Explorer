@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilingual Bible Verse Explorer — Depths to Heights</title>
+    <meta name="description" content="Explore Bible verses in English and Finnish with historical context, reflections, and prayers. A free educational tool for deeper spiritual understanding.">
+    <meta property="og:title" content="Bilingual Bible Verse Explorer">
+    <meta property="og:description" content="Explore Bible verses in English and Finnish with historical context, reflections, and prayers.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://depthstoheights.github.io/bilingual-bible-explorer/">
+    <meta name="theme-color" content="#0b1324">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0b1324;
+            --secondary: #1e3a5f;
+            --accent: #d4af37;
+            --accent-light: #f4e5b8;
+            --text-light: #f5f5f5;
+            --text-dark: #0b1324;
+            --bg-light: #ffffff;
+            --bg-card: #f8f9fa;
+            --border: #e0e0e0;
+            --success: #28a745;
+            --error: #dc3545;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        body.dyslexia-friendly {
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+            letter-spacing: 0.1em;
+            word-spacing: 0.2em;
+            line-height: 1.8;
+        }
+
+        body.high-contrast {
+            --primary: #000000;
+            --secondary: #222222;
+            --accent: #ffff00;
+            --accent-light: #ffffcc;
+            --text-light: #ffffff;
+            --bg-card: #111111;
+            --border: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .brand {
+            font-size: 0.9rem;
+            color: var(--accent-light);
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease;
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 20px;
+            border: 2px solid var(--accent);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-dark);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-light);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        button {
+            padding: 12px 25px;
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--accent-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .language-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: var(--secondary);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: var(--transition);
+        }
+
+        .toggle-switch.active {
+            background: var(--accent);
+        }
+
+        .toggle-switch.active::after {
+            left: 32px;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--text-dark);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .verse-display {
+            background: linear-gradient(135deg, var(--accent-light) 0%, rgba(255, 255, 255, 0.9) 100%);
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+
+        .verse-reference {
+            font-weight: bold;
+            color: var(--secondary);
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+        }
+
+        .quiz-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .quiz-option:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .quiz-option.correct {
+            background: #d4edda;
+            border-color: var(--success);
+        }
+
+        .quiz-option.incorrect {
+            background: #f8d7da;
+            border-color: var(--error);
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: var(--success);
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: var(--error);
+        }
+
+        .reflection-box {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px dashed var(--accent);
+            margin: 15px 0;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .accessibility-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--text-dark);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+        }
+
+        .a11y-btn {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .a11y-btn:hover {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        .text-size-slider {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--accent-light);
+        }
+
+        .donation-note {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .donation-note a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .donation-note a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .input-group { flex-direction: column; }
+            input[type="text"] { width: 100%; }
+            .accessibility-controls { bottom: 10px; right: 10px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        .share-button {
+            background: var(--secondary);
+            color: white;
+            margin-left: 10px;
+        }
+
+        .share-button:hover {
+            background: var(--accent);
+        }
+
+        .fun-fact {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(255, 255, 255, 0.5));
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .prayer-prompt {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 10px;
+            font-style: italic;
+            margin: 15px 0;
+            border: 1px solid var(--accent-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📖 Bilingual Bible Verse Explorer</h1>
+            <p class="subtitle">Explore God's Word in English and Finnish with deeper understanding</p>
+            <p class="brand">Made by Justin — Depths to Heights</p>
+        </header>
+
+        <div class="controls">
+            <div class="input-group">
+                <input type="text" 
+                       id="themeInput" 
+                       placeholder="Enter a theme (e.g., love, forgiveness, hope)" 
+                       aria-label="Bible theme input">
+                <button onclick="exploreTheme()" id="exploreBtn">Explore Theme</button>
+                <button onclick="getRandomTheme()">Random Theme</button>
+                <button class="share-button" onclick="shareVerse()" id="shareBtn" style="display:none;">Share</button>
+            </div>
+
+            <div class="language-toggle">
+                <span id="langLabel">English</span>
+                <div class="toggle-switch" id="langToggle" onclick="toggleLanguage()"></div>
+                <span>Suomi</span>
+            </div>
+        </div>
+
+        <div id="loadingIndicator" style="display:none; text-align:center; padding:20px;">
+            <div class="loading"></div>
+            <p style="margin-top:10px;">Loading spiritual insights...</p>
+        </div>
+
+        <div id="contentArea"></div>
+
+        <div class="donation-note">
+            <p>✨ Free to use. If this encouraged you, feel free to buy me a coffee:</p>
+            <a href="https://www.paypal.com/donate/?hosted_button_id=8GRE7B8C3TP2U" target="_blank">
+                Support via PayPal
+            </a>
+            <p style="margin-top:10px;">Made by Justin — Depths to Heights</p>
+        </div>
+
+        <footer class="footer">
+            <p>Made by Justin — Depths to Heights · depthstoheights@gmail.com</p>
+            <p style="margin-top:10px; font-size:0.9rem;">
+                Spiritual encouragement and education—not medical advice.<br>
+                In the U.S., call/text 988 for crisis support; elsewhere use your local emergency number.
+            </p>
+        </footer>
+    </div>
+
+    <!-- Accessibility Controls -->
+    <div class="accessibility-controls">
+        <button class="a11y-btn" onclick="toggleDyslexiaFont()">Toggle Dyslexia Font</button>
+        <button class="a11y-btn" onclick="toggleHighContrast()">High Contrast</button>
+        <label for="textSize" style="font-size:0.9rem;">Text Size:</label>
+        <input type="range" id="textSize" class="text-size-slider" min="12" max="24" value="16" 
+               onchange="adjustTextSize(this.value)">
+    </div>
+
+    <script>
+        // App State
+        let currentLanguage = 'en';
+        let currentVerse = null;
+        let currentTheme = '';
+
+        // Language translations
+        const translations = {
+            en: {
+                explore: 'Explore Theme',
+                random: 'Random Theme',
+                share: 'Share',
+                loading: 'Loading spiritual insights...',
+                verse: 'Verse',
+                explanation: 'Historical Context & Meaning',
+                quiz: 'Test Your Understanding',
+                reflection: 'Reflection Question',
+                prayer: 'Prayer Prompt',
+                funFact: 'Did You Know?',
+                journal: 'Your Reflections',
+                save: 'Save',
+                export: 'Export Journal',
+                correct: 'Correct! Well done!',
+                incorrect: 'Not quite. Try again!',
+                themes: ['love', 'forgiveness', 'hope', 'faith', 'peace', 'joy', 'patience', 'kindness', 'wisdom', 'courage']
+            },
+            fi: {
+                explore: 'Tutki Teemaa',
+                random: 'Satunnainen Teema',
+                share: 'Jaa',
+                loading: 'Ladataan hengellistä viisautta...',
+                verse: 'Jae',
+                explanation: 'Historiallinen Konteksti & Merkitys',
+                quiz: 'Testaa Ymmärryksesi',
+                reflection: 'Pohdintakysymys',
+                prayer: 'Rukouskehotus',
+                funFact: 'Tiesitkö?',
+                journal: 'Omat Pohdintasi',
+                save: 'Tallenna',
+                export: 'Vie Päiväkirja',
+                correct: 'Oikein! Hyvin tehty!',
+                incorrect: 'Ei aivan. Yritä uudelleen!',
+                themes: ['rakkaus', 'anteeksianto', 'toivo', 'usko', 'rauha', 'ilo', 'kärsivällisyys', 'ystävällisyys', 'viisaus', 'rohkeus']
+            }
+        };
+
+        // Bible verses database (simplified for demo)
+        const verseDatabase = {
+            love: {
+                en: {
+                    text: "Love is patient, love is kind. It does not envy, it does not boast, it is not proud.",
+                    reference: "1 Corinthians 13:4",
+                    explanation: "This passage from Paul's first letter to the Corinthians was written around 55 AD to address divisions in the church. The Greek word 'agape' used here represents unconditional, selfless love.",
+                    quiz: {
+                        question: "What does Paul say love does NOT do?",
+                        options: ["It does not rejoice", "It does not envy or boast", "It does not forgive", "It does not hope"],
+                        correct: 1
+                    },
+                    reflection: "How can you practice patient love today with someone who challenges you?",
+                    prayer: "Lord, help me to love others with the patience and kindness You show me daily. Transform my heart to reflect Your perfect love.",
+                    funFact: "The word 'love' appears over 300 times in the Bible, with different Greek words distinguishing between romantic love (eros), friendship (phileo), and unconditional love (agape)."
+                },
+                fi: {
+                    text: "Rakkaus on kärsivällinen, rakkaus on lempeä. Rakkaus ei kadehdi, ei kerskaa, ei pöyhkeile.",
+                    reference: "1. Korinttolaiskirje 13:4",
+                    explanation: "Tämä kohta Paavalin ensimmäisestä kirjeestä korinttolaisille kirjoitettiin noin vuonna 55 jKr. käsittelemään seurakunnan jakautumista.",
+                    quiz: {
+                        question: "Mitä Paavali sanoo, että rakkaus EI tee?",
+                        options: ["Se ei iloitse", "Se ei kadehdi eikä kerskaa", "Se ei anna anteeksi", "Se ei toivo"],
+                        correct: 1
+                    },
+                    reflection: "Miten voit harjoittaa kärsivällistä rakkautta tänään jonkun kanssa, joka haastaa sinua?",
+                    prayer: "Herra, auta minua rakastamaan muita sillä kärsivällisyydellä ja lempeydellä, jota osoitat minulle päivittäin.",
+                    funFact: "Sana 'rakkaus' esiintyy Raamatussa yli 300 kertaa."
+                }
+            },
+            forgiveness: {
+                en: {
+                    text: "Be kind and compassionate to one another, forgiving each other, just as in Christ God forgave you.",
+                    reference: "Ephesians 4:32",
+                    explanation: "Written to the church in Ephesus around 60-62 AD while Paul was imprisoned in Rome. The Greek word for forgiveness here literally means 'to grant as a favor.'",
+                    quiz: {
+                        question: "According to Ephesians, why should we forgive others?",
+                        options: ["To earn salvation", "Because God forgave us in Christ", "To avoid punishment", "To gain favor"],
+                        correct: 1
+                    },
+                    reflection: "Is there someone you need to forgive today? What step can you take toward reconciliation?",
+                    prayer: "Father, as You have forgiven me through Christ, give me the strength and grace to forgive those who have hurt me.",
+                    funFact: "Jesus taught that we should forgive 'seventy times seven' times, symbolizing unlimited forgiveness."
+                },
+                fi: {
+                    text: "Olkaa toisianne kohtaan ystävällisiä ja lempeitä ja antakaa toisillenne anteeksi, niin kuin Jumalakin on Kristuksessa antanut teille anteeksi.",
+                    reference: "Efesolaiskirje 4:32",
+                    explanation: "Kirjoitettu Efesoksen seurakunnalle noin 60-62 jKr. Paavalin ollessa vangittuna Roomassa.",
+                    quiz: {
+                        question: "Miksi meidän tulisi Efesolaiskirjeen mukaan antaa anteeksi muille?",
+                        options: ["Ansaitaksemme pelastuksen", "Koska Jumala antoi meille anteeksi Kristuksessa", "Välttääksemme rangaistuksen", "Saadaksemme suosiota"],
+                        correct: 1
+                    },
+                    reflection: "Onko joku, jolle sinun pitäisi antaa anteeksi tänään?",
+                    prayer: "Isä, kuten olet antanut minulle anteeksi Kristuksen kautta, anna minulle voima antaa anteeksi.",
+                    funFact: "Jeesus opetti antamaan anteeksi 'seitsemänkymmentä kertaa seitsemän' kertaa."
+                }
+            },
+            hope: {
+                en: {
+                    text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.",
+                    reference: "Jeremiah 29:11",
+                    explanation: "This prophetic message was delivered to Jewish exiles in Babylon around 597 BC. Despite their suffering, God promised future restoration.",
+                    quiz: {
+                        question: "What kind of plans does God declare He has for His people?",
+                        options: ["Plans for wealth", "Plans to prosper and give hope", "Plans for power", "Plans to avoid troubles"],
+                        correct: 1
+                    },
+                    reflection: "In what area of your life do you need to trust God's plans over your own understanding?",
+                    prayer: "Lord, when I cannot see the way forward, help me trust in Your perfect plans.",
+                    funFact: "The Book of Jeremiah contains over 50 prophecies, many fulfilled during the prophet's lifetime."
+                },
+                fi: {
+                    text: "Minä tiedän, mitä ajatuksia minulla on teidän suhteenne, sanoo Herra: rauhan eikä turmion ajatuksia.",
+                    reference: "Jeremia 29:11",
+                    explanation: "Tämä profeetallinen viesti toimitettiin juutalaisille pakkosiirtolaisille Babylonissa noin 597 eKr.",
+                    quiz: {
+                        question: "Millaisia suunnitelmia Jumala julistaa hänellä olevan kansalleen?",
+                        options: ["Rikkauden suunnitelmia", "Menestyksen ja toivon suunnitelmia", "Vallan suunnitelmia", "Vaikeuksien välttämisen suunnitelmia"],
+                        correct: 1
+                    },
+                    reflection: "Millä elämäsi alueella sinun täytyy luottaa Jumalan suunnitelmiin?",
+                    prayer: "Herra, kun en näe tietä eteenpäin, auta minua luottamaan täydellisiin suunnitelmiisi.",
+                    funFact: "Jeremian kirja sisältää yli 50 profetiaa."
+                }
+            }
+        };
+
+        // Theme exploration function
+        function exploreTheme() {
+            const input = document.getElementById('themeInput').value.trim().toLowerCase();
+            if (!input) {
+                alert('Please enter a theme');
+                return;
+            }
+            
+            // Find matching theme or use first one as default
+            const theme = Object.keys(verseDatabase).find(key => 
+                key.includes(input) || input.includes(key)
+            ) || 'love';
+            
+            currentTheme = theme;
+            displayVerse(theme);
+        }
+
+        // Random theme function
+        function getRandomTheme() {
+            const themes = Object.keys(verseDatabase);
+            const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+            document.getElementById('themeInput').value = randomTheme;
+            currentTheme = randomTheme;
+            displayVerse(randomTheme);
+        }
+
+        // Display verse and content
+        function displayVerse(theme) {
+            const content = verseDatabase[theme];
+            if (!content) return;
+            
+            const lang = currentLanguage;
+            const verseData = content[lang] || content['en'];
+            currentVerse = verseData;
+            
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = `
+                <div class="content-card">
+                    <h2 class="section-title">${translations[lang].verse}</h2>
+                    <div class="verse-display">
+                        <p>${verseData.text}</p>
+                        <p class="verse-reference">${verseData.reference}</p>
+                    </div>
+                    
+                    <h3 class="section-title">${translations[lang].explanation}</h3>
+                    <p>${verseData.explanation}</p>
+                    
+                    <h3 class="section-title">${translations[lang].quiz}</h3>
+                    <p>${verseData.quiz.question}</p>
+                    <div id="quizOptions">
+                        ${verseData.quiz.options.map((option, index) => 
+                            `<button class="quiz-option" onclick="checkAnswer(${index})">${option}</button>`
+                        ).join('')}
+                    </div>
+                    <div id="quizFeedback"></div>
+                    
+                    <h3 class="section-title">${translations[lang].reflection}</h3>
+                    <div class="reflection-box">
+                        <p>${verseData.reflection}</p>
+                        <textarea placeholder="${translations[lang].journal}" id="journalEntry"></textarea>
+                        <button onclick="saveJournal()" style="margin-top:10px;">${translations[lang].save}</button>
+                    </div>
+                    
+                    <h3 class="section-title">${translations[lang].prayer}</h3>
+                    <div class="prayer-prompt">
+                        <p>${verseData.prayer}</p>
+                    </div>
+                    
+                    <div class="fun-fact">
+                        <h4 style="margin-bottom:10px;">${translations[lang].funFact}</h4>
+                        <p>${verseData.funFact}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('shareBtn').style.display = 'inline-block';
+        }
+
+        // Quiz answer checker
+        function checkAnswer(index) {
+            const correct = currentVerse.quiz.correct;
+            const feedback = document.getElementById('quizFeedback');
+            const options = document.querySelectorAll('.quiz-option');
+            
+            options.forEach((opt, i) => {
+                opt.disabled = true;
+                if (i === index) {
+                    opt.classList.add(index === correct ? 'correct' : 'incorrect');
+                }
+                if (i === correct) {
+                    opt.classList.add('correct');
+                }
+            });
+            
+            feedback.innerHTML = `
+                <div class="feedback ${index === correct ? 'correct' : 'incorrect'}">
+                    ${index === correct ? translations[currentLanguage].correct : translations[currentLanguage].incorrect}
+                </div>
+            `;
+        }
+
+        // Language toggle
+        function toggleLanguage() {
+            const toggle = document.getElementById('langToggle');
+            toggle.classList.toggle('active');
+            currentLanguage = currentLanguage === 'en' ? 'fi' : 'en';
+            
+            // Update UI labels
+            document.getElementById('exploreBtn').textContent = translations[currentLanguage].explore;
+            document.getElementById('langLabel').textContent = currentLanguage === 'en' ? 'English' : 'Suomi';
+            
+            // Refresh content if verse is displayed
+            if (currentTheme) {
+                displayVerse(currentTheme);
+            }
+        }
+
+        // Journal saving
+        function saveJournal() {
+            const entry = document.getElementById('journalEntry').value;
+            if (!entry) return;
+            
+            const journals = JSON.parse(localStorage.getItem('bibleJournals') || '[]');
+            journals.push({
+                date: new Date().toISOString(),
+                theme: currentTheme,
+                entry: entry,
+                verse: currentVerse.reference
+            });
+            localStorage.setItem('bibleJournals', JSON.stringify(journals));
+            alert('Journal entry saved!');
+        }
+
+        // Share functionality
+        function shareVerse() {
+            if (!currentVerse) return;
+            
+            const shareText = `${currentVerse.text}\n\n- ${currentVerse.reference}\n\nExplore more at: ${window.location.href}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Bible Verse',
+                    text: shareText
+                });
+            } else {
+                navigator.clipboard.writeText(shareText);
+                alert('Verse copied to clipboard!');
+            }
+        }
+
+        // Accessibility functions
+        function toggleDyslexiaFont() {
+            document.body.classList.toggle('dyslexia-friendly');
+        }
+
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+        }
+
+        function adjustTextSize(size) {
+            document.documentElement.style.fontSize = size + 'px';
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved preferences
+            const savedFontSize = localStorage.getItem('fontSize');
+            if (savedFontSize) {
+                document.getElementById('textSize').value = savedFontSize;
+                adjustTextSize(savedFontSize);
+            }
+            
+            // Add enter key support for input
+            document.getElementById('themeInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    exploreTheme();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
